@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# API Endpoints
+POST           /users/:userId/favouriteStudios/:studioId        controllers.StudioController.add(userId: Int, studioId: Int)
+DELETE         /users/:userId/favouriteStudios/:studioId        controllers.StudioController.remove(userId: Int, studioId: Int)
+GET            /users/:userId/favouriteStudios/:studioId        controllers.StudioController.find(userId: Int, studioId: Int)
+GET            /users/:userId/favouriteStudios                  controllers.StudioController.findAll(userId: Int)
+GET            /users                                           controllers.StudioController.getAll()
+POST           /hello                                           controllers.StudioController.sayHello()
+POST           /studio                                          controllers.StudioController.studio()
+
+# Credentitials
+POST           /signUp                                          controllers.CredentialController.signUp
+POST           /signIn                                          controllers.CredentialController.signIn
+GET            /signOut                                         controllers.CredentialController.signOut
