@@ -19,60 +19,60 @@ class BookDAO @Inject() (dbapi: DBApi) {
 
   val parser: RowParser[Book] = Macro.namedParser[Book]
 
- /* def create(favourite: FavouriteStudio) = {
+  def create(book: Book) = {
     val query =
       """
-        INSERT IGNORE INTO favouriteStudio (userId, studioId)
-        VALUES ({userId}, {studioId});
+        INSERT INTO Book (bookId, author, bookName)
+        VALUES ({bookId}, {studioId}, {bookName});
       """
     db.withConnection { implicit c =>
       SQL(query)
-        .on("userId" -> favourite.userId, "studioId" -> favourite.studioId)
+        .on("bookId" -> book.bookId, "studioId" -> book.author, "bookName" -> book.bookId)
         .executeInsert()
     }
   }
 
-  def delete(favourite: FavouriteStudio) = {
+  def delete(book: Book) = {
     val query =
       """
-        DELETE FROM favouriteStudio
-        WHERE userId={userId} AND studioId={studioId}
+        DELETE FROM Book
+        WHERE bookId={bookId}
         LIMIT 1;
       """
     db.withConnection { implicit c =>
       SQL(query)
-        .on("userId" -> favourite.userId, "studioId" -> favourite.studioId)
+        .on("bookId" -> book.bookId)
         .executeUpdate()
     }
   }
 
-  def exists(favourite: FavouriteStudio): Boolean = {
+  def exists(book: Book): Boolean = {
     val query =
       """
         SELECT COUNT(*) as numMatches
-        FROM favouriteStudio
-        WHERE userId={userId} AND studioId={studioId};
+        FROM Book
+        WHERE bookId={bookId};
       """
     val result = db.withConnection { implicit c =>
       SQL(query)
-        .on("userId" -> favourite.userId, "studioId" -> favourite.studioId)
+        .on("bookId" -> book.bookId)
         .as(scalar[Long].single)
         .asInstanceOf[Long]
     }
     result != 0
   }
 
-  def index(userId: Int): List[FavouriteStudio] = {
+  def getBookById (bookId: Int): List[Book] = {
     val query =
       """
         SELECT *
-        FROM favouriteStudio
-        WHERE userId={userId};
+        FROM Book
+        WHERE bookId={bookId};
       """
     db.withConnection { implicit c =>
-      SQL(query).on("userId" -> userId).as(parser.*)
+      SQL(query).on("bookId" -> bookId).as(parser.*)
     }
-  }*/
+  }
 
   def getAllBooks: List[Book] = {
     val query =
