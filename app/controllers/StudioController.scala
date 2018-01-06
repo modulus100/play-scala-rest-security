@@ -4,8 +4,8 @@ import javax.inject._
 
 import com.mohiva.play.silhouette.api.Silhouette
 import credential.authentication.DefaultEnv
-import models.FavouriteStudio
-import models.service.FavouriteStudioService
+import models.{Book, FavouriteStudio}
+import models.service.{BookService, FavouriteStudioService}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -17,7 +17,8 @@ import scala.concurrent.Future
 @Singleton
 class StudioController @Inject() (cc: ControllerComponents,
                                   val silhouette: Silhouette[DefaultEnv],
-                                  service: FavouriteStudioService) extends AbstractController(cc) {
+                                  service: FavouriteStudioService,
+                                  service2: BookService) extends AbstractController(cc) {
 
   implicit val userFormat: Reads[(String, Long)] = formatter.JsonFormatter.userFormat
 
@@ -27,6 +28,28 @@ class StudioController @Inject() (cc: ControllerComponents,
   implicit val favouriteStudioWrites: Writes[FavouriteStudio] = (
     (JsPath \ "userId").write[Int] and
     (JsPath \ "studioId").write[Int])(unlift(FavouriteStudio.unapply))
+
+  implicit val booksWrites: Writes[Book] = (
+    (JsPath \ "bookId").write[Int] and
+      (JsPath \ "author").write[String] and
+      (JsPath \ "bookName").write[String]
+    )(unlift(Book.unapply))
+
+  implicit val bookFormat: Reads[(Int, String, String)] = (
+    (JsPath \ 'bookId).read[Int] and
+      (JsPath \ 'author).read[String] and
+      (JsPath \ 'bookName).read[String]) tupled
+
+  /*
+  implicit val userFormat: Reads[(String, Long)] = (
+    (JsPath \ 'name).read[String] and (JsPath \ 'age).read[Long]) tupled
+  * */
+
+  /*implicit val residentWrites: Writes[Book] = (
+    (JsPath \ "name").write[String] and
+      (JsPath \ "age").write[Int] and
+      (JsPath \ "role").writeNullable[String]
+    )(unlift(Book.unapply))*/
 
   def add(userId: Int, studioId: Int) = Action {
     Ok(Json.obj("data" -> service.addFavourite(userId, studioId)))
@@ -50,7 +73,7 @@ class StudioController @Inject() (cc: ControllerComponents,
     }
 
   def getAll = Action {
-    Ok(Json.obj("data" -> service.getAllUsers))
+    Ok(Json.obj("data" -> service2.getAllBooks))
   }
 
   def sayHello: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>

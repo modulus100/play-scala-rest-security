@@ -3,6 +3,7 @@ package models.service
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.api.services.IdentityService
 import models.User
 import models.mongo.UserDAO
 

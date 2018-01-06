@@ -1,10 +1,9 @@
 package models.service
 
-import com.mohiva.play.silhouette.api.services.IdentityService
-import models.User
-
 import scala.concurrent.Future
+import com.mohiva.play.silhouette.api.services.IdentityService
 
+import models.User
 
 /**
   * Handles actions to users.

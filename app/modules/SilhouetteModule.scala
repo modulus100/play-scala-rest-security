@@ -24,7 +24,6 @@ import net.ceedubs.ficus.Ficus._
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.libs.ws.WSClient
-import models.service.UserService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

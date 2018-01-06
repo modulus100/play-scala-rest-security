@@ -20,14 +20,14 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import models.User
 import credential.authentication.{DefaultEnv, SignInData, SignUpData}
-import models.service.UserService
+import models.service.UserServiceImpl
 
 
 class CredentialController @Inject()(implicit ec: ExecutionContext,
                                      messagesApi: MessagesApi,
                                      silhouette: Silhouette[DefaultEnv],
                                      cc: ControllerComponents,
-                                     userService: UserService,
+                                     userService: UserServiceImpl,
                                      credentialsProvider: CredentialsProvider,
                                      configuration: Configuration,
                                      passwordHasher: PasswordHasher,
@@ -42,38 +42,42 @@ class CredentialController @Inject()(implicit ec: ExecutionContext,
       data => {
         credentialsProvider.authenticate(Credentials(data.email, data.password)).flatMap { loginInfo =>
           userService.retrieve(loginInfo).flatMap {
-            case Some(user) => silhouette.env.authenticatorService.create(loginInfo).map {
-              case authenticator if data.rememberMe =>
-                val c = configuration.underlying
-                authenticator.copy(
-                  expirationDateTime = clock.now + c.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry"),
-                  idleTimeout = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout")
-                )
-              case authenticator => authenticator
+            case Some(user) =>
+              silhouette.env.authenticatorService.create(loginInfo).map {
+                case authenticator if data.rememberMe =>
+                  val c = configuration.underlying
+                  authenticator.copy(
+                    expirationDateTime = clock.now + c.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry"),
+                    idleTimeout = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"))
+
+                case authenticator => authenticator
             }.flatMap { authenticator =>
               silhouette.env.eventBus.publish(LoginEvent(user, request))
-              silhouette.env.authenticatorService.init(authenticator).map { token =>
-                Ok(Json.obj("token" -> token))
-              }
+              silhouette.env.authenticatorService.init(authenticator).map {
+                token => Ok(Json.obj("token" -> token)) }
             }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
           }
         }.recover {
-          case e: ProviderException =>
-            Unauthorized(Json.obj("message" -> Messages("invalid.credentials")))
+          case e: ProviderException => Unauthorized(Json.obj("message" -> Messages("invalid.credentials")))
         }
-      })
+      }
+    )
   }
 
   def signUp: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[SignUpData].fold(
       errors => {
-        Future.successful(Unauthorized(Json.obj("message" -> Messages("invalid.data"), "errors" -> JsError.toJson(errors))))
+        Future.successful(
+          Unauthorized(Json.obj("message" -> Messages("invalid.data"), "errors" -> JsError.toJson(errors))))
       },
       data => {
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
         userService.retrieve(loginInfo).flatMap {
-          case Some(user) => Future.successful(BadRequest(Json.obj("message" -> Messages("user.exists"))))
+          case Some(user) =>
+            Future.successful(
+              BadRequest(Json.obj("message" -> Messages("user.exists"))))
+
           case None =>
             val user = User(
               userId = UUID.randomUUID(),
@@ -85,6 +89,7 @@ class CredentialController @Inject()(implicit ec: ExecutionContext,
               passwordInfo = None)
 
             val authInfo = passwordHasher.hash(data.password)
+
             for {
               user <- userService.save(user)
               authInfo <- authInfoRepository.add(loginInfo, authInfo)
