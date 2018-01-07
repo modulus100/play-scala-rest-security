@@ -4,8 +4,9 @@ import javax.inject._
 
 import com.mohiva.play.silhouette.api.Silhouette
 import credential.authentication.DefaultEnv
-import models.{Book, FavouriteStudio}
-import models.service.{BookService, FavouriteStudioService}
+import models.Book
+import models.service.BookService
+import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -15,30 +16,63 @@ import scala.concurrent.Future
 
 
 @Singleton
-class StudioController @Inject() (cc: ControllerComponents,
-                                  val silhouette: Silhouette[DefaultEnv],
-                                  service: FavouriteStudioService,
-                                  service2: BookService) extends AbstractController(cc) {
+class BookController @Inject()(cc: ControllerComponents,
+                               val silhouette: Silhouette[DefaultEnv],
+                               service: BookService) extends AbstractController(cc) {
+
+  val jsonHeader = "data"
 
   implicit val userFormat: Reads[(String, Long)] = formatter.JsonFormatter.userFormat
 
-  implicit val StudioReads: Reads[(Int, Int)] = (
-    (JsPath \ 'id1).read[Int] and (JsPath \ 'id2).read[Int]) tupled
-
-  implicit val favouriteStudioWrites: Writes[FavouriteStudio] = (
-    (JsPath \ "userId").write[Int] and
-    (JsPath \ "studioId").write[Int])(unlift(FavouriteStudio.unapply))
-
-  implicit val booksWrites: Writes[Book] = (
+  implicit val bookWrites: Writes[Book] = (
     (JsPath \ "bookId").write[Int] and
       (JsPath \ "author").write[String] and
       (JsPath \ "bookName").write[String]
     )(unlift(Book.unapply))
 
-  implicit val bookFormat: Reads[(Int, String, String)] = (
+  implicit val bookReads: Reads[(Int, String, String)] = (
     (JsPath \ 'bookId).read[Int] and
       (JsPath \ 'author).read[String] and
       (JsPath \ 'bookName).read[String]) tupled
+
+  def save: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
+    request.body.validate[Book].fold(
+      errors =>
+        Future.successful(
+          BadRequest(Json.obj(jsonHeader -> "Invalid Data", "errors" -> JsError.toJson(errors)))),
+      book => {
+        if (service.saveBook(book))
+          Future.successful(Ok(Json.obj(jsonHeader -> "Book saved")))
+        else
+          Future.successful(BadRequest(Json.obj(jsonHeader -> "A book could't be saved")))
+      }
+    )
+  }
+
+  def read(bookId: Int) = silhouette.SecuredAction { request =>
+    Ok(Json.obj(jsonHeader -> service.getBookById(bookId)))
+  }
+
+  def update: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
+    request.body.validate[Book].fold(
+      errors =>
+        Future.successful(
+          BadRequest(Json.obj(jsonHeader -> "Invalid Data", "errors" -> JsError.toJson(errors)))),
+      book => {
+        if (service.updateBook(book))
+          Future.successful(Ok(Json.obj(jsonHeader -> "Book updated")))
+        else
+          Future.successful(BadRequest(Json.obj(jsonHeader -> "Book could't be updated")))
+      }
+    )
+  }
+
+  def delete(bookId: Int) = silhouette.SecuredAction { request =>
+    if (service.deleteBookById(bookId))
+      Ok(Json.obj(jsonHeader -> "Book succesfully deleted"))
+    else
+      BadRequest(Json.obj(jsonHeader -> "No book with this id"))
+  }
 
   /*
   implicit val userFormat: Reads[(String, Long)] = (
@@ -51,7 +85,7 @@ class StudioController @Inject() (cc: ControllerComponents,
       (JsPath \ "role").writeNullable[String]
     )(unlift(Book.unapply))*/
 
-  def add(userId: Int, studioId: Int) = Action {
+  /*def add(userId: Int, studioId: Int) = Action {
     Ok(Json.obj("data" -> service.addFavourite(userId, studioId)))
   }
 
@@ -89,5 +123,5 @@ class StudioController @Inject() (cc: ControllerComponents,
       request.body.validate[FavouriteStudio]
         .map { case (studio) => Ok(Json.obj("result" -> studio)) }
         .recoverTotal { e => BadRequest("error:" + JsError.toJson(e)) })
-  }
+  }*/
 }

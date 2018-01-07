@@ -1,5 +1,5 @@
 import akka.actor.ActorSystem
-import controllers.StudioController
+import controllers.BookController
 import org.scalatestplus.play._
 import play.api.test.Helpers._
 import play.api.test.FakeRequest

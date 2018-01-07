@@ -3,15 +3,20 @@
 # ~~~~
 
 # API Endpoints
-POST           /users/:userId/favouriteStudios/:studioId        controllers.StudioController.add(userId: Int, studioId: Int)
-DELETE         /users/:userId/favouriteStudios/:studioId        controllers.StudioController.remove(userId: Int, studioId: Int)
-GET            /users/:userId/favouriteStudios/:studioId        controllers.StudioController.find(userId: Int, studioId: Int)
-GET            /users/:userId/favouriteStudios                  controllers.StudioController.findAll(userId: Int)
-GET            /users                                           controllers.StudioController.getAll()
-POST           /hello                                           controllers.StudioController.sayHello()
-POST           /studio                                          controllers.StudioController.studio()
+#POST           /users/:userId/favouriteStudios/:studioId        controllers.BookController.add(userId: Int, studioId: Int)
+#DELETE         /users/:userId/favouriteStudios/:studioId        controllers.BookController.remove(userId: Int, studioId: Int)
+#GET            /users/:userId/favouriteStudios/:studioId        controllers.BookController.find(userId: Int, studioId: Int)
+#GET            /users/:userId/favouriteStudios                  controllers.BookController.findAll(userId: Int)
+#GET            /users                                           controllers.BookController.getAll()
+#POST           /hello                                           controllers.BookController.sayHello()
+#POST           /studio                                          controllers.BookController.studio()
+
+POST          /book                controllers.BookController.save
+GET           /book/:bookId        controllers.BookController.read(bookId: Int)
+PUT           /book                controllers.BookController.update
+DELETE        /book/:bookId        controllers.BookController.delete(bookId: Int)
 
 # Credentitials
-POST           /signUp                                          controllers.CredentialController.signUp
-POST           /signIn                                          controllers.CredentialController.signIn
-GET            /signOut                                         controllers.CredentialController.signOut
+POST          /signUp              controllers.CredentialController.signUp
+POST          /signIn              controllers.CredentialController.signIn
+GET           /signOut             controllers.CredentialController.signOut

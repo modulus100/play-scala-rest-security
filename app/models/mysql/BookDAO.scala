@@ -4,16 +4,12 @@ import javax.inject.Inject
 
 import anorm.SqlParser._
 import anorm.{Macro, RowParser, _}
-import anorm.SqlParser._
-import anorm.{Macro, RowParser, _}
-import models.FavouriteStudio
-import play.api.db.DBApi
-import models.{Book, FavouriteStudio}
+import models.Book
 import play.api.db.DBApi
 
 
 @javax.inject.Singleton
-class BookDAO @Inject() (dbapi: DBApi) {
+class BookDAO @Inject()(dbapi: DBApi) {
 
   private val db = dbapi.database("default")
 
@@ -23,46 +19,17 @@ class BookDAO @Inject() (dbapi: DBApi) {
     val query =
       """
         INSERT INTO Book (bookId, author, bookName)
-        VALUES ({bookId}, {studioId}, {bookName});
-      """
-    db.withConnection { implicit c =>
-      SQL(query)
-        .on("bookId" -> book.bookId, "studioId" -> book.author, "bookName" -> book.bookId)
-        .executeInsert()
-    }
-  }
-
-  def delete(book: Book) = {
-    val query =
-      """
-        DELETE FROM Book
-        WHERE bookId={bookId}
-        LIMIT 1;
-      """
-    db.withConnection { implicit c =>
-      SQL(query)
-        .on("bookId" -> book.bookId)
-        .executeUpdate()
-    }
-  }
-
-  def exists(book: Book): Boolean = {
-    val query =
-      """
-        SELECT COUNT(*) as numMatches
-        FROM Book
-        WHERE bookId={bookId};
+        VALUES ({bookId}, {author}, {bookName});
       """
     val result = db.withConnection { implicit c =>
       SQL(query)
-        .on("bookId" -> book.bookId)
-        .as(scalar[Long].single)
-        .asInstanceOf[Long]
+        .on("bookId" -> book.bookId, "author" -> book.author, "bookName" -> book.bookName)
+        .executeInsert()
     }
     result != 0
   }
 
-  def getBookById (bookId: Int): List[Book] = {
+  def read(bookId: Int): List[Book] = {
     val query =
       """
         SELECT *
@@ -74,7 +41,55 @@ class BookDAO @Inject() (dbapi: DBApi) {
     }
   }
 
-  def getAllBooks: List[Book] = {
+  def update(book: Book): Boolean = {
+    val query =
+      """
+        UPDATE Book
+        SET bookId={bookId},
+            author={author},
+            bookName={bookName}
+        WHERE bookId={bookId};
+      """
+    val result = db.withConnection { implicit c =>
+      SQL(query)
+        .on("bookId" -> book.bookId, "author" -> book.author, "bookName" -> book.bookName)
+        .executeUpdate()
+    }
+    result != 0
+  }
+
+  def delete(bookId: Int): Boolean = {
+    val query =
+      """
+        DELETE FROM Book
+        WHERE bookId={bookId}
+        LIMIT 1;
+      """
+    val result = db.withConnection { implicit c =>
+      SQL(query)
+        .on("bookId" -> bookId)
+        .executeUpdate()
+    }
+    result != 0
+  }
+
+  def exists(bookId: Int): Boolean = {
+    val query =
+      """
+        SELECT COUNT(*) as numMatches
+        FROM Book
+        WHERE bookId={bookId};
+      """
+    val result = db.withConnection { implicit c =>
+      SQL(query)
+        .on("bookId" -> bookId)
+        .as(scalar[Long].single)
+        .asInstanceOf[Long]
+    }
+    result != 0
+  }
+
+  def books: List[Book] = {
     val query =
       """
         SELECT bookId, author, bookName
