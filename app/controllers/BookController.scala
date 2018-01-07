@@ -21,7 +21,7 @@ class BookController @Inject()(cc: ControllerComponents,
                                service: BookService) extends AbstractController(cc) {
 
   val jsonHeader = "data"
-  implicit val userFormat: Reads[(String, Long)] = formatter.JsonFormatter.userFormat
+  implicit val userReads: Reads[(String, Long)] = formatter.JsonFormatter.userReads
   implicit val bookWrites: Writes[Book] = formatter.JsonFormatter.bookWrites
   implicit val bookReads: Reads[(Int, String, String)] = formatter.JsonFormatter.bookReads
 
@@ -39,7 +39,7 @@ class BookController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def read(bookId: Int) = silhouette.SecuredAction { request =>
+  def read(bookId: Int) = silhouette.SecuredAction {
     Ok(Json.obj(jsonHeader -> service.getBookById(bookId)))
   }
 
@@ -66,6 +66,14 @@ class BookController @Inject()(cc: ControllerComponents,
 
   def allBooks = silhouette.SecuredAction {
     Ok(Json.obj(jsonHeader -> service.getAllBooks))
+  }
+
+  def testJson: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
+    Future.successful(
+      request.body.validate[(String, Long)]
+        .map { case (name, age) => Ok(Json.obj("result" -> name)) }
+        .recoverTotal { e => BadRequest("error:" + JsError.toJson(e))}
+    )
   }
 
   /*

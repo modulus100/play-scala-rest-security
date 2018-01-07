@@ -15,8 +15,9 @@ POST          /book                controllers.BookController.create
 GET           /book/:bookId        controllers.BookController.read(bookId: Int)
 PUT           /book                controllers.BookController.update
 DELETE        /book/:bookId        controllers.BookController.delete(bookId: Int)
+GET           /book                controllers.BookController.allBooks
 
-GET           /books               controllers.BookController.allBooks
+POST          /test                controllers.BookController.testJson
 
 # Credentitials
 POST          /signUp              controllers.CredentialController.signUp

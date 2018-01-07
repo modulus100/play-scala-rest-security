@@ -6,7 +6,7 @@ import play.api.libs.functional.syntax._
 
 object JsonFormatter {
 
-  implicit val userFormat: Reads[(String, Long)] = (
+  implicit val userReads: Reads[(String, Long)] = (
     (JsPath \ 'name).read[String] and (JsPath \ 'age).read[Long]) tupled
 
   implicit val bookWrites: Writes[Book] = (
