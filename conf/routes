@@ -3,14 +3,6 @@
 # ~~~~
 
 # API Endpoints
-#POST           /users/:userId/favouriteStudios/:studioId        controllers.BookController.add(userId: Int, studioId: Int)
-#DELETE         /users/:userId/favouriteStudios/:studioId        controllers.BookController.remove(userId: Int, studioId: Int)
-#GET            /users/:userId/favouriteStudios/:studioId        controllers.BookController.find(userId: Int, studioId: Int)
-#GET            /users/:userId/favouriteStudios                  controllers.BookController.findAll(userId: Int)
-#GET            /users                                           controllers.BookController.getAll()
-#POST           /hello                                           controllers.BookController.sayHello()
-#POST           /studio                                          controllers.BookController.studio()
-
 POST          /book                controllers.BookController.create
 GET           /book/:bookId        controllers.BookController.read(bookId: Int)
 PUT           /book                controllers.BookController.update
