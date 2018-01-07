@@ -21,21 +21,11 @@ class BookController @Inject()(cc: ControllerComponents,
                                service: BookService) extends AbstractController(cc) {
 
   val jsonHeader = "data"
-
   implicit val userFormat: Reads[(String, Long)] = formatter.JsonFormatter.userFormat
+  implicit val bookWrites: Writes[Book] = formatter.JsonFormatter.bookWrites
+  implicit val bookReads: Reads[(Int, String, String)] = formatter.JsonFormatter.bookReads
 
-  implicit val bookWrites: Writes[Book] = (
-    (JsPath \ "bookId").write[Int] and
-      (JsPath \ "author").write[String] and
-      (JsPath \ "bookName").write[String]
-    )(unlift(Book.unapply))
-
-  implicit val bookReads: Reads[(Int, String, String)] = (
-    (JsPath \ 'bookId).read[Int] and
-      (JsPath \ 'author).read[String] and
-      (JsPath \ 'bookName).read[String]) tupled
-
-  def save: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
+  def create: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
     request.body.validate[Book].fold(
       errors =>
         Future.successful(
@@ -67,11 +57,15 @@ class BookController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def delete(bookId: Int) = silhouette.SecuredAction { request =>
+  def delete(bookId: Int) = silhouette.SecuredAction {
     if (service.deleteBookById(bookId))
       Ok(Json.obj(jsonHeader -> "Book succesfully deleted"))
     else
       BadRequest(Json.obj(jsonHeader -> "No book with this id"))
+  }
+
+  def allBooks = silhouette.SecuredAction {
+    Ok(Json.obj(jsonHeader -> service.getAllBooks))
   }
 
   /*

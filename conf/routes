@@ -11,10 +11,12 @@
 #POST           /hello                                           controllers.BookController.sayHello()
 #POST           /studio                                          controllers.BookController.studio()
 
-POST          /book                controllers.BookController.save
+POST          /book                controllers.BookController.create
 GET           /book/:bookId        controllers.BookController.read(bookId: Int)
 PUT           /book                controllers.BookController.update
 DELETE        /book/:bookId        controllers.BookController.delete(bookId: Int)
+
+GET           /books               controllers.BookController.allBooks
 
 # Credentitials
 POST          /signUp              controllers.CredentialController.signUp
