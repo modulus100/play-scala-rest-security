@@ -36,7 +36,7 @@ class CredentialsController @Inject()(implicit ec: ExecutionContext,
                                       authInfoRepository: AuthInfoRepository,
                                       clock: Clock) extends AbstractController(cc) with I18nSupport {
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Sign In using json body")
   def signIn: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[SignInData].fold(
       errors => {
@@ -68,7 +68,7 @@ class CredentialsController @Inject()(implicit ec: ExecutionContext,
     )
   }
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Sign up using json body")
   def signUp: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[SignUpData].fold(
       errors => {
@@ -109,7 +109,7 @@ class CredentialsController @Inject()(implicit ec: ExecutionContext,
     )
   }
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Sing Out using json body")
   def signOut: Action[AnyContent] = silhouette.SecuredAction.async { implicit request =>
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, Ok)

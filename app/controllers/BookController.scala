@@ -23,7 +23,7 @@ class BookController @Inject()(cc: ControllerComponents,
   implicit val bookWrites: Writes[Book] = formatter.JsonFormatter.bookWrites
   implicit val bookReads: Reads[(Int, String, String)] = formatter.JsonFormatter.bookReads
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Add a new book to a database")
   def create: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
     request.body.validate[Book].fold(
       errors =>
@@ -38,13 +38,13 @@ class BookController @Inject()(cc: ControllerComponents,
     )
   }
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Get a book from a database by Id")
   def read(bookId: Int) = silhouette.SecuredAction.async {
     Future.successful(
       Ok(Json.obj(jsonHeader -> service.getBookById(bookId))))
   }
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Update a book")
   def update: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
     request.body.validate[Book].fold(
       errors =>
@@ -59,7 +59,7 @@ class BookController @Inject()(cc: ControllerComponents,
     )
   }
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Delete a book by Id")
   def delete(bookId: Int) = silhouette.SecuredAction {
     if (service.deleteBookById(bookId))
       Ok(Json.obj(jsonHeader -> "Book succesfully deleted"))
@@ -67,7 +67,7 @@ class BookController @Inject()(cc: ControllerComponents,
       BadRequest(Json.obj(jsonHeader -> "No book with this id"))
   }
 
-  @ApiOperation(value = "Get bad password value")
+  @ApiOperation(value = "Get all books")
   def allBooks = silhouette.SecuredAction.async {
     Future.successful(
       Ok(Json.obj(jsonHeader -> service.getAllBooks)))
