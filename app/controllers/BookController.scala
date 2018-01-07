@@ -4,17 +4,16 @@ import javax.inject._
 
 import com.mohiva.play.silhouette.api.Silhouette
 import credential.authentication.DefaultEnv
+import io.swagger.annotations.Api
 import models.Book
 import models.service.BookService
-import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc.{Action, _}
 
 import scala.concurrent.Future
 
-
+@Api(value = "API")
 @Singleton
 class BookController @Inject()(cc: ControllerComponents,
                                val silhouette: Silhouette[DefaultEnv],
@@ -39,8 +38,9 @@ class BookController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def read(bookId: Int) = silhouette.SecuredAction {
-    Ok(Json.obj(jsonHeader -> service.getBookById(bookId)))
+  def read(bookId: Int) = silhouette.SecuredAction.async {
+    Future.successful(
+      Ok(Json.obj(jsonHeader -> service.getBookById(bookId))))
   }
 
   def update: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>
@@ -64,8 +64,9 @@ class BookController @Inject()(cc: ControllerComponents,
       BadRequest(Json.obj(jsonHeader -> "No book with this id"))
   }
 
-  def allBooks = silhouette.SecuredAction {
-    Ok(Json.obj(jsonHeader -> service.getAllBooks))
+  def allBooks = silhouette.SecuredAction.async {
+    Future.successful(
+      Ok(Json.obj(jsonHeader -> service.getAllBooks)))
   }
 
   def testJson: Action[JsValue] = silhouette.SecuredAction.async(parse.json) { request =>

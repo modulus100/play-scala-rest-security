@@ -12,6 +12,6 @@ GET           /book                controllers.BookController.allBooks
 POST          /test                controllers.BookController.testJson
 
 # Credentitials
-POST          /signUp              controllers.CredentialController.signUp
-POST          /signIn              controllers.CredentialController.signIn
-GET           /signOut             controllers.CredentialController.signOut
+POST          /signUp              controllers.CredentialsController.signUp
+POST          /signIn              controllers.CredentialsController.signIn
+GET           /signOut             controllers.CredentialsController.signOut

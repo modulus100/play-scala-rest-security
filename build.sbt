@@ -13,6 +13,8 @@ resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 scalaVersion := "2.12.2"
 
 val silhouetteVer = "5.0.0"
+val swaggerUIVersion = "3.6.1"
+
 lazy val silhouetteLib = Seq(
   "com.mohiva" %% "play-silhouette" % silhouetteVer,
   "com.mohiva" %% "play-silhouette-password-bcrypt" % silhouetteVer,
@@ -30,6 +32,8 @@ libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % "0.12.7-play26",
   "net.codingwell" %% "scala-guice" % "4.1.0",
   "com.iheart" %% "ficus" % "1.4.3",
+  "io.swagger" %% "swagger-play2" % "1.6.1-SNAPSHOT",
+  "org.webjars" % "swagger-ui" % swaggerUIVersion,
 ) ++ silhouetteLib
 
 //enablePlugins(DockerPlugin)

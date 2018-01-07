@@ -23,16 +23,16 @@ import credential.authentication.{DefaultEnv, SignInData, SignUpData}
 import models.service.UserServiceImpl
 
 
-class CredentialController @Inject()(implicit ec: ExecutionContext,
-                                     messagesApi: MessagesApi,
-                                     silhouette: Silhouette[DefaultEnv],
-                                     cc: ControllerComponents,
-                                     userService: UserServiceImpl,
-                                     credentialsProvider: CredentialsProvider,
-                                     configuration: Configuration,
-                                     passwordHasher: PasswordHasher,
-                                     authInfoRepository: AuthInfoRepository,
-                                     clock: Clock) extends AbstractController(cc) with I18nSupport {
+class CredentialsController @Inject()(implicit ec: ExecutionContext,
+                                      messagesApi: MessagesApi,
+                                      silhouette: Silhouette[DefaultEnv],
+                                      cc: ControllerComponents,
+                                      userService: UserServiceImpl,
+                                      credentialsProvider: CredentialsProvider,
+                                      configuration: Configuration,
+                                      passwordHasher: PasswordHasher,
+                                      authInfoRepository: AuthInfoRepository,
+                                      clock: Clock) extends AbstractController(cc) with I18nSupport {
 
   def signIn: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[SignInData].fold(
