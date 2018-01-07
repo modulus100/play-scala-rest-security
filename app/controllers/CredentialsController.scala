@@ -20,9 +20,11 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import models.User
 import credential.authentication.{DefaultEnv, SignInData, SignUpData}
+import io.swagger.annotations.{Api, ApiOperation}
 import models.service.UserServiceImpl
 
 
+@Api(value = "Authentication")
 class CredentialsController @Inject()(implicit ec: ExecutionContext,
                                       messagesApi: MessagesApi,
                                       silhouette: Silhouette[DefaultEnv],
@@ -34,6 +36,7 @@ class CredentialsController @Inject()(implicit ec: ExecutionContext,
                                       authInfoRepository: AuthInfoRepository,
                                       clock: Clock) extends AbstractController(cc) with I18nSupport {
 
+  @ApiOperation(value = "Get bad password value")
   def signIn: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[SignInData].fold(
       errors => {
@@ -65,6 +68,7 @@ class CredentialsController @Inject()(implicit ec: ExecutionContext,
     )
   }
 
+  @ApiOperation(value = "Get bad password value")
   def signUp: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[SignUpData].fold(
       errors => {
@@ -105,6 +109,7 @@ class CredentialsController @Inject()(implicit ec: ExecutionContext,
     )
   }
 
+  @ApiOperation(value = "Get bad password value")
   def signOut: Action[AnyContent] = silhouette.SecuredAction.async { implicit request =>
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, Ok)

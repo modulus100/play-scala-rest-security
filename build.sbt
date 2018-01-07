@@ -23,6 +23,8 @@ lazy val silhouetteLib = Seq(
   "com.mohiva" %% "play-silhouette-testkit" % silhouetteVer % "test"
 )
 
+unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
+
 libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 libraryDependencies ++= Seq(
@@ -32,8 +34,9 @@ libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % "0.12.7-play26",
   "net.codingwell" %% "scala-guice" % "4.1.0",
   "com.iheart" %% "ficus" % "1.4.3",
+  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
   "io.swagger" %% "swagger-play2" % "1.6.1-SNAPSHOT",
-  "org.webjars" % "swagger-ui" % swaggerUIVersion,
+  "org.webjars" % "swagger-ui" % swaggerUIVersion
 ) ++ silhouetteLib
 
 //enablePlugins(DockerPlugin)

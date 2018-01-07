@@ -2,16 +2,23 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# API Endpoints
+# Credentitials
+POST          /signUp              controllers.CredentialsController.signUp
+POST          /signIn              controllers.CredentialsController.signIn
+GET           /signOut             controllers.CredentialsController.signOut
+
+# Book CRUD API
 POST          /book                controllers.BookController.create
 GET           /book/:bookId        controllers.BookController.read(bookId: Int)
 PUT           /book                controllers.BookController.update
 DELETE        /book/:bookId        controllers.BookController.delete(bookId: Int)
 GET           /book                controllers.BookController.allBooks
 
-POST          /test                controllers.BookController.testJson
+# App API
+POST          /test                controllers.AppController.testJson
 
-# Credentitials
-POST          /signUp              controllers.CredentialsController.signUp
-POST          /signIn              controllers.CredentialsController.signIn
-GET           /signOut             controllers.CredentialsController.signOut
+# Swagger API
+GET           /swagger.json        controllers.ApiHelpController.getResources
+GET           /docs                controllers.AppController.redirectDocs
+
+GET         /assets/*file          controllers.Assets.versioned(path="/public", file: Asset)
